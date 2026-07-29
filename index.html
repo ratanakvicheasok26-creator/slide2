@@ -182,15 +182,16 @@ slides.push({type:'concept', eyebrow:'Callbacks', title:'Callback Functions',
   sub:'A function passed as an argument, to be run later — after some task finishes.',
   left:{h:'How it works', badge:'y', text:'Functions are values in JS, so they can be passed into other functions and invoked once the async operation completes.',
     list:['Runs after the outer function finishes its job','Common in timers, events, and older Node APIs (fs, http)','Basis for every other async pattern that followed']},
-  rightCode:{h:'Example', code:`<span class="kw">function</span> <span class="fn">greet</span>(name, callback) {
-  <span class="fn">setTimeout</span>(() => {
-    callback(<span class="str">\`Hello, \${name}!\`</span>);
-  }, <span class="num">1000</span>);
+  rightCode:{h:'Example', code:`<span class="kw">function</span> <span class="fn">greet</span>(name) {
+  <span class="fn">console</span>.log(<span class="str">"Hello " + name</span>);
 }
 
-<span class="fn">greet</span>(<span class="str">'Spy'</span>, (msg) => {
-  <span class="fn">console</span>.log(msg); <span class="c1">// after 1s</span>
-});`}});
+<span class="kw">function</span> <span class="fn">processUser</span>(callback) {
+  <span class="kw">const</span> username = <span class="str">"Thun Thun Sahour"</span>;
+  callback(username);
+}
+
+<span class="fn">processUser</span>(greet);`}});
 
 slides.push({type:'concept', eyebrow:'The problem with callbacks', title:'Callback Hell',
   sub:'Nesting callback inside callback inside callback — code grows sideways, not down.',
