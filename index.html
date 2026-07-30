@@ -355,9 +355,12 @@ slides.push({type:'concept', eyebrow:'Keyboard Events', title:'Keyboard Events',
   sub:'Fired when the user interacts with the keyboard while an element has focus.',
   left:{h:'Common types', badge:'y', text:null,
     list:['<code>keydown</code> — key pressed down (repeats while held)','<code>keyup</code> — key released','<code>e.key</code> — the character or key name','Useful for shortcuts, games, live validation']},
-  rightCode:{h:'Example', code:`document.addEventListener(<span class="str">'keydown'</span>, (e) => {
-  <span class="kw">if</span> (e.key === <span class="str">'Enter'</span>) {
-    submitForm();
+  rightCode:{h:'Real-world: Close modal on Escape', code:`<span class="kw">const</span> modal = document.querySelector(<span class="str">'#promo-modal'</span>);
+
+document.addEventListener(<span class="str">'keydown'</span>, (event) => {
+  <span class="kw">if</span> (event.key === <span class="str">'Escape'</span> && modal.classList.contains(<span class="str">'open'</span>)) {
+    modal.classList.remove(<span class="str">'open'</span>);
+    <span class="fn">console</span>.log(<span class="str">'Modal closed via keyboard shortcut.'</span>);
   }
 });`}});
 
@@ -365,36 +368,56 @@ slides.push({type:'concept', eyebrow:'Form Events', title:'Form Events',
   sub:'Fired as users fill out and submit forms — the backbone of client-side validation.',
   left:{h:'Common types', badge:'y', text:null,
     list:['<code>submit</code> — form submitted (form element)','<code>change</code> — value committed (on blur / select)','<code>input</code> — fires on every keystroke','<code>focus</code> / <code>blur</code> — field gains / loses focus']},
-  rightCode:{h:'Example', code:`form.addEventListener(<span class="str">'submit'</span>, (e) => {
-  e.preventDefault(); <span class="c1">// stop page reload</span>
-  <span class="kw">if</span> (!email.value.includes(<span class="str">'@'</span>)) {
-    <span class="fn">alert</span>(<span class="str">'Invalid email'</span>);
-  }
+  rightCode:{h:'Real-world: Form submit & live search', code:`<span class="kw">const</span> searchInput = document.querySelector(<span class="str">'#search-input'</span>);
+<span class="kw">const</span> signupForm = document.querySelector(<span class="str">'#signup-form'</span>);
+
+<span class="c1">// Live search feedback on typing</span>
+searchInput.addEventListener(<span class="str">'input'</span>, (event) => {
+  <span class="kw">const</span> query = event.target.value.toLowerCase();
+  <span class="fn">console</span>.log(<span class="str">'Filtering results for:'</span>, query);
+});
+
+<span class="c1">// Prevent page refresh on form submission</span>
+signupForm.addEventListener(<span class="str">'submit'</span>, (event) => {
+  event.preventDefault();
+  <span class="kw">const</span> formData = <span class="kw">new</span> <span class="fn">FormData</span>(signupForm);
+  <span class="kw">const</span> data = <span class="fn">Object.fromEntries</span>(formData);
+  <span class="fn">console</span>.log(<span class="str">'Sending data to API:'</span>, data);
 });`}});
 
 slides.push({type:'concept', eyebrow:'Page-level events', title:'Window / Document Events',
   sub:'Fired by the browser itself, about the page as a whole rather than one element.',
   left:{h:'Common types', badge:'y', text:null,
     list:['<code>DOMContentLoaded</code> — HTML parsed, DOM ready','<code>load</code> — page + all assets fully loaded','<code>resize</code> — browser window size changes','<code>scroll</code> — user scrolls the page']},
-  rightCode:{h:'Example', code:`document.addEventListener(<span class="str">'DOMContentLoaded'</span>, () => {
-  <span class="fn">console</span>.log(<span class="str">'DOM ready'</span>);
+  rightCode:{h:'Real-world: Sticky nav & DOM ready', code:`<span class="kw">const</span> navbar = document.querySelector(<span class="str">'.navbar'</span>);
+
+window.addEventListener(<span class="str">'scroll'</span>, () => {
+  <span class="kw">if</span> (window.scrollY > <span class="num">50</span>) {
+    navbar.classList.add(<span class="str">'navbar-scrolled'</span>);
+  } <span class="kw">else</span> {
+    navbar.classList.remove(<span class="str">'navbar-scrolled'</span>);
+  }
 });
 
-window.addEventListener(<span class="str">'resize'</span>, () => {
-  <span class="fn">console</span>.log(innerWidth, innerHeight);
+document.addEventListener(<span class="str">'DOMContentLoaded'</span>, () => {
+  <span class="fn">console</span>.log(<span class="str">'DOM ready — initializing app components.'</span>);
 });`}});
 
 slides.push({type:'concept', eyebrow:'Event propagation', title:'Event Bubbling',
   sub:'After an event fires on the target element, it travels back up through its ancestors — the default phase.',
   left:{h:'How it works', badge:'w', text:'A click on a deeply nested element also "bubbles" up: the same click event re-fires on its parent, grandparent, and so on up to document.',
     list:['This is the default phase listeners react to','Lets a parent react to events from any descendant','<code>e.stopPropagation()</code> stops the bubble early']},
-  rightCode:{h:'Example', code:`outer.addEventListener(<span class="str">'click'</span>, () =>
-  <span class="fn">console</span>.log(<span class="str">'outer (bubble)'</span>));
+  rightCode:{h:'Real-world: Dropdown & stopPropagation', code:`<span class="kw">const</span> profileButton = document.querySelector(<span class="str">'#profile-btn'</span>);
+<span class="kw">const</span> dropdownMenu = document.querySelector(<span class="str">'#dropdown-menu'</span>);
 
-inner.addEventListener(<span class="str">'click'</span>, () =>
-  <span class="fn">console</span>.log(<span class="str">'inner (target)'</span>));
+profileButton.addEventListener(<span class="str">'click'</span>, (event) => {
+  event.stopPropagation();
+  dropdownMenu.classList.toggle(<span class="str">'is-visible'</span>);
+});
 
-<span class="c1">// click inner → "inner", then "outer"</span>`}});
+document.addEventListener(<span class="str">'click'</span>, () => {
+  dropdownMenu.classList.remove(<span class="str">'is-visible'</span>);
+});`}});
 
 slides.push({type:'concept', eyebrow:'Event propagation', title:'Event Capturing',
   sub:'The phase before bubbling — the event travels from the window down to the target element.',
@@ -425,15 +448,19 @@ slides.push({type:'concept', eyebrow:'Beyond built-in events', title:'Custom Eve
   sub:'Define and dispatch your own named events to signal things specific to your app.',
   left:{h:'Why use them', badge:'y', text:'Lets independent parts of an app communicate without tightly coupling them together — a mini publish/subscribe pattern built into the DOM.',
     list:['Created with the CustomEvent constructor','Can carry data via the detail property','Dispatched and listened for like any native event']},
-  rightCode:{h:'Example', code:`<span class="kw">const</span> ev = <span class="kw">new</span> <span class="fn">CustomEvent</span>(<span class="str">'cartUpdated'</span>, {
-  detail: { items: <span class="num">3</span> }
+  rightCode:{h:'Real-world: Shopping cart event', code:`<span class="kw">const</span> cartButton = document.querySelector(<span class="str">'#add-to-cart-btn'</span>);
+
+cartButton.addEventListener(<span class="str">'click'</span>, () => {
+  <span class="kw">const</span> itemAdded = <span class="kw">new</span> <span class="fn">CustomEvent</span>(<span class="str">'cart:updated'</span>, {
+    detail: { itemId: <span class="num">1042</span>, name: <span class="str">'Wireless Headphones'</span>, price: <span class="num">99.99</span> }
+  });
+  window.dispatchEvent(itemAdded);
 });
 
-document.addEventListener(<span class="str">'cartUpdated'</span>, (e) => {
-  <span class="fn">console</span>.log(e.detail.items);
-});
-
-document.dispatchEvent(ev);`}});
+window.addEventListener(<span class="str">'cart:updated'</span>, (event) => {
+  <span class="kw">const</span> { name, price } = event.detail;
+  <span class="fn">console</span>.log(<span class="str">'Cart Badge Updated! Added:'</span>, name, <span class="str">'($'</span> + price + <span class="str">')'</span>);
+});`}});
 
 slides.push({type:'summary'});
 
